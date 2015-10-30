@@ -1,4 +1,4 @@
-package filedriver
+package posixfs
 
 import (
 	"errors"
