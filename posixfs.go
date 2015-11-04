@@ -52,18 +52,20 @@ func (driver *PosixFSDriver) Stat(path string) (server.FileInfo, error) {
 	return &BasicFileInfo{f}, nil
 }
 
-func (driver *PosixFSDriver) DirContents(path string) ([]server.FileInfo, error) {
+func (driver *PosixFSDriver) ListDir(path string, callback func(server.FileInfo) error) error {
 	basepath := filepath.Join(driver.RootPath, path)
 	fis, err := ioutil.ReadDir(basepath)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	files := make([]server.FileInfo, 0)
 	for _, finfo := range fis {
-		files = append(files, &BasicFileInfo{finfo})
+		err = callback(&BasicFileInfo{finfo})
+		if err != nil {
+			return err
+		}
 	}
-	return files, nil
+	return nil
 }
 
 func (driver *PosixFSDriver) DeleteDir(path string) error {
